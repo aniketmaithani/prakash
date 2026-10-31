@@ -183,19 +183,33 @@ async function refreshAll() {
   const order = [...NEWS_COUNTRIES].sort((a, b) => (state.byCountry.get(a.code)?.fetchedAt || 0) - (state.byCountry.get(b.code)?.fetchedAt || 0));
   state.progress = { done: 0, total: order.length };
   state.failures = 0;
-  await pool(order, CONCURRENCY, async (c) => {
+  const empty = [];
+  const load = async (c) => {
     try {
       const articles = await fetchCountry(c);
       if (articles.length) {
         state.byCountry.set(c.code, { articles, fetchedAt: Date.now() });
         state.version++;
+        return true;
       }
     } catch {
       state.failures++;
     }
+    return false;
+  };
+  await pool(order, CONCURRENCY, async (c) => {
+    if (!(await load(c))) empty.push(c);
     state.progress.done++;
     if (state.progress.done % 15 === 0) saveSnapshotSoon();
   });
+  // Bing sometimes answers a burst of requests with empty feeds (it does this a lot to cloud
+  // machines like GitHub's runners). A slower second pass usually gets them.
+  if (empty.length) {
+    await pool(empty, 2, async (c) => {
+      await new Promise((r) => setTimeout(r, 300));
+      await load(c);
+    });
+  }
   state.lastFullRefresh = Date.now();
   state.refreshing = false;
   saveSnapshotSoon();
