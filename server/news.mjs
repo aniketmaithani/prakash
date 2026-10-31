@@ -201,6 +201,17 @@ async function refreshAll() {
   saveSnapshotSoon();
 }
 
+/** One full sweep, then return. Used by the static build to bake headlines into JSON. */
+export async function refreshOnce() {
+  loadSnapshot();
+  state.lastFullRefresh = 0;
+  await refreshAll();
+  clearTimeout(snapshotTimer);
+  mkdirSync(CACHE_DIR, { recursive: true });
+  writeFileSync(CACHE_FILE, JSON.stringify({ lastFullRefresh: state.lastFullRefresh, byCountry: Object.fromEntries(state.byCountry) }));
+  return { failures: state.failures, countries: state.byCountry.size };
+}
+
 export function startNewsEngine() {
   loadSnapshot();
   const tick = () => { if (Date.now() - state.lastFullRefresh > FRESH_MS) refreshAll(); };

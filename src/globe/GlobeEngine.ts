@@ -10,6 +10,9 @@ import type { Feature, Geometry, MultiLineString } from "geojson";
 import * as S from "./shaders";
 import { subsolarPoint } from "../lib/sun";
 
+// Assets live under the deploy base so the app also works from a sub-path (GitHub Pages).
+const BASE = import.meta.env.BASE_URL;
+
 export interface BeaconDatum {
   code: string;
   lat: number;
@@ -245,12 +248,12 @@ export class GlobeEngine {
   }
 
   private buildScene() {
-    const day = this.tex("/textures/earth-day-4k.jpg");
-    const night = this.tex("/textures/earth-night-4k.jpg");
-    const clouds = this.tex("/textures/earth-clouds-4k.jpg", false);
-    const spec = this.tex("/textures/earth-specular-2k.jpg", false);
-    const bump = this.tex("/textures/earth-bump-2k.png", false);
-    const stars = this.tex("/textures/stars-4k.jpg");
+    const day = this.tex(BASE + "textures/earth-day-4k.jpg");
+    const night = this.tex(BASE + "textures/earth-night-4k.jpg");
+    const clouds = this.tex(BASE + "textures/earth-clouds-4k.jpg", false);
+    const spec = this.tex(BASE + "textures/earth-specular-2k.jpg", false);
+    const bump = this.tex(BASE + "textures/earth-bump-2k.png", false);
+    const stars = this.tex(BASE + "textures/stars-4k.jpg");
 
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(R, 192, 96),
@@ -316,7 +319,7 @@ export class GlobeEngine {
   }
 
   private async loadGeo() {
-    const topo = (await fetch("/geo/countries-50m.json").then((r) => r.json())) as Topology<{ countries: GeometryCollection<{ name: string }> }>;
+    const topo = (await fetch(BASE + "geo/countries-50m.json").then((r) => r.json())) as Topology<{ countries: GeometryCollection<{ name: string }> }>;
     const { COUNTRY_CODE_BY_NUMERIC } = await import("./numeric");
     const fc = feature(topo, topo.objects.countries);
     for (const f of fc.features) {
@@ -362,7 +365,7 @@ export class GlobeEngine {
     this.ultraLoaded = true;
     const loader = new THREE.TextureLoader();
     const u = this.earth.material.uniforms;
-    for (const [key, url] of [["dayMap", "/textures/earth-day-8k.jpg"], ["nightMap", "/textures/earth-night-8k.jpg"]] as const) {
+    for (const [key, url] of [["dayMap", BASE + "textures/earth-day-8k.jpg"], ["nightMap", BASE + "textures/earth-night-8k.jpg"]] as const) {
       loader.load(url, (t) => {
         if (this.disposed) return t.dispose();
         t.colorSpace = THREE.SRGBColorSpace;

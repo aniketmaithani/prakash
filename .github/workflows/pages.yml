@@ -1,0 +1,61 @@
+name: Deploy to GitHub Pages
+
+# Pages can only serve files, so this job fetches the headlines itself and ships
+# them as JSON next to the app. The schedule keeps the news fresh.
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Keep the last sweep around so a country that fails to load keeps its older stories.
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: news-${{ github.run_id }}
+          restore-keys: news-
+
+      - name: Build
+        run: npm run build -- --base=/${{ github.event.repository.name }}/
+        env:
+          VITE_STATIC: "1"
+
+      - name: Fetch headlines
+        run: node scripts/snapshot.mjs dist/data
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
