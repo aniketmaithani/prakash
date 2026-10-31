@@ -2,7 +2,7 @@
 
 Prakash puts the day's news on a 3D globe. You spin the Earth, click a country, and read what its newsrooms are reporting. It pulls headlines from about 180 countries and refreshes every half hour.
 
-Live: https://aniketmaithani.github.io/prakash/
+Live: https://aniketmaithani.net/prakash/
 
 ![The globe with the story feed on the right](docs/globe.jpg)
 
