@@ -12,8 +12,14 @@ iso.registerLocale(require("i18n-iso-countries/langs/en.json"));
 const topo50 = JSON.parse(readFileSync(new URL("../node_modules/world-atlas/countries-50m.json", import.meta.url)));
 const topo110 = JSON.parse(readFileSync(new URL("../node_modules/world-atlas/countries-110m.json", import.meta.url)));
 
+// India, Pakistan and China take their shapes from the India-view borders the globe draws
+// (public/geo, built by build-geo.mjs) so centre points and sizes match what's on screen.
+const pov = JSON.parse(readFileSync(new URL("../public/geo/countries-50m.json", import.meta.url)));
+const POV_IDS = new Set(["356", "586", "156"]);
+const povById = new Map(feature(pov, pov.objects.countries).features.filter((f) => POV_IDS.has(f.id)).map((f) => [f.id, f]));
+
 // Geometries without an ISO code, attached to the country that newsrooms file them under.
-const UNCODED = { Kosovo: "XK", Somaliland: "SO", "N. Cyprus": "CY", "Siachen Glacier": "IN", "Indian Ocean Ter.": "AU" };
+const UNCODED = { Kosovo: "XK", Somaliland: "SO", "N. Cyprus": "CY", "Indian Ocean Ter.": "AU" };
 
 // Names people actually type and newsrooms actually print.
 const NAME = {
@@ -59,8 +65,9 @@ const fc = feature(topo50, topo50.objects.countries);
 const coarse = new Set(topo110.objects.countries.geometries.map((g) => g.id).filter(Boolean));
 
 const byCode = new Map();
-fc.features.forEach((f, i) => {
+fc.features.forEach((atlasFeature, i) => {
   const g = geoms[i];
+  const f = povById.get(g.id) || atlasFeature;
   const atlasName = g.properties.name;
   const code = g.id ? iso.numericToAlpha2(g.id) : UNCODED[atlasName];
   if (!code) return;

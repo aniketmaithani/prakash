@@ -69,7 +69,8 @@ To host your own copy, fork the repo, go to Settings → Pages, set the source t
 - Headlines come from Bing News RSS. Every story links to the original publisher.
 - Topics are guessed from keywords in the headline, so a few land in the wrong bucket.
 - Earth textures are from [Solar System Scope](https://www.solarsystemscope.com/textures/) (CC BY 4.0, based on NASA imagery). The relief and water masks come from the three-globe examples.
-- Country borders are from Natural Earth, via `world-atlas`. Flags are from flagcdn.com, and outlet icons are Google's favicon service.
+- Country borders are from Natural Earth's India edition, which shows the whole of Jammu & Kashmir and Ladakh as part of India. Natural Earth only publishes it at high detail, so `scripts/build-geo.mjs` simplifies it for the globe.
+- Flags are from flagcdn.com, and outlet icons are Google's favicon service.
 - Original idea and design: [NewsGlobe](https://newsglobe.saurabhn.com/) by Saurabh Nandedkar ([@EXTREMOPHILARUM](https://github.com/EXTREMOPHILARUM)).
 
 `scripts/build-countries.mjs` regenerates `src/data/countries.json`, which holds country names, centre points, search terms and the aliases used to spot mentions. Run it if you want to change how a country is searched or recognised.

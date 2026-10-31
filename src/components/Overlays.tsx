@@ -386,7 +386,7 @@ export function AboutModal() {
         <h3>Sources and credits</h3>
         <p className="about-small">
           Headlines are gathered from Bing News and link straight to each publisher. Topics are assigned automatically from headline wording and can be wrong.
-          Earth imagery by Solar System Scope, based on NASA data (CC BY 4.0). Country shapes from Natural Earth via world-atlas. Flags by flagcdn.
+          Earth imagery by Solar System Scope, based on NASA data (CC BY 4.0). Country borders from Natural Earth (India edition). Flags by flagcdn.
           Prakash started as a redesign of <a href="https://newsglobe.saurabhn.com/" target="_blank" rel="noreferrer">NewsGlobe</a> by
           Saurabh Nandedkar (<a href="https://github.com/EXTREMOPHILARUM" target="_blank" rel="noreferrer">@EXTREMOPHILARUM</a>). The idea is his.
         </p>
